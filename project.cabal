@@ -16,7 +16,8 @@ library
 
 library monads
     exposed-modules:  
-        TryWriter
+        TryWriter,
+        TryReader
     build-depends:    
         base ^>=4.16.4.0,
         mtl,
