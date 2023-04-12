@@ -1,6 +1,8 @@
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+
 {-# HLINT ignore "Eta reduce" #-}
 module TryReader where
+
 import Control.Monad.Reader (Reader)
 
 -- this topic review the operator <$>, especially for the functor
@@ -12,8 +14,8 @@ import Control.Monad.Reader (Reader)
 
 -- ThinkMore: the (-> r) is also a monad, for some reason it's called Reader
 
-combineMulti5AndPlus3 :: (Int -> Int -> Int)-> Int -> Int
-combineMulti5AndPlus3 f x = let
-    a = (+3) x
-    b = (*5) x
-    in f a b
+combineMulti5AndPlus3 :: (Int -> Int -> Int) -> Int -> Int
+combineMulti5AndPlus3 f x =
+  let a = (+ 3) x
+      b = (* 5) x
+   in f a b
