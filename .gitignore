@@ -55,3 +55,6 @@ TAGS
 
 # co-log
 *.log
+
+# ignore the main because it's not a library, just somewhere to trigger the library
+app/Main.hs
