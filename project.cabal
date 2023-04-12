@@ -22,7 +22,8 @@ library monads
     build-depends:    
         base ^>=4.16.4.0,
         mtl,
-        transformers
+        transformers,
+        random
     hs-source-dirs:   src/monads
     default-language: Haskell2010
 

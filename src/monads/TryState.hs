@@ -1,8 +1,12 @@
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Redundant return" #-}
 {-# HLINT ignore "Use guards" #-}
+
 module TryState where
 import Control.Monad.State
+import System.Random ( Random(random), RandomGen, StdGen, mkStdGen ) 
+import Text.Printf (vFmt)
+import Text.ParserCombinators.ReadP (count)
 
 -- Global state or variables are typically not-pure.
 -- However, some computations rely on states, for example, a state machanine, a data structure to hold something, etc.
@@ -37,6 +41,8 @@ pushVState :: Int -> State Stack ()
 pushVState a = state $ \xs -> ((), a:xs)
 
 push1NumAndPop2VState :: State Stack Int
+-- in the scope of push1NumAndPop2VState, we can ignore the state value, and only focus on the result
+-- It's a syntax sugar to benefit such cases, so the operation logic never changes.
 push1NumAndPop2VState = do
     pushVState 3
     a <- popVState
@@ -44,42 +50,69 @@ push1NumAndPop2VState = do
     return b
 
 
--- ThinkMore: how to implement a binary search tree in haskell? It contains state natively
-data Tree a = Leaf | Node (Tree a) a (Tree a)
-    deriving (Show, Eq)
+-- using a structure with states, we need to construct a new one and use it each time
+genAndPrintRandomTwice :: IO ()
+genAndPrintRandomTwice = do
+    -- random is a polymorphic function that can generate random values of different types, and the compiler doesn't know which type to choose.
+    let (num, generator) = random genSeed  :: (Int, StdGen)
+    print num
+    let (num2,g2) = random generator :: (Int, StdGen)
+    print num2
 
-addValue :: Ord a => a -> Tree a -> Tree a
-addValue x tree =
-    case tree of
-        Leaf -> Node Leaf x Leaf
-        Node left y right ->
-            if x < y
-                then Node (addValue x left) y right
-                else Node left y (addValue x right)
+-- newtype State s a = State { runState :: s -> (a, s) }, random:: (RandomGen g, Random a) => g -> (a, g)
+-- randomSt constructs a state monad with the random function
+randomSt :: (RandomGen g, Random a) => State g a
+-- if you want to operate the value wrapped inside the state monad, you should hold a fn instead it
+-- the <- is a syntax sugar of operator ">>="
+-- It will modify the value hold inside a state monad, and return the new state monad
+-- >>= :: State s a -> (a -> State s b) -> State s b, 
+-- newtype State s a = State { runState :: s -> (a, s) }
+-- pure :: a -> State s a, this means the s could be intepreted to StdGen.
+-- the s in randomSt is a functor(also a reader monad), 
+randomSt = state random
 
--- ThinkMore: the removeValue function is bad implementation. Maybe appears everywhere.
-removeValue :: Ord a => a -> Tree a -> (Maybe a,Tree a)
-removeValue x Leaf = (Nothing, Leaf)
-removeValue x (Node left y right)
-    | x < y = 
-        case removeValue x left of
-            (_, left) -> (Nothing, Node left y right)
-     | x > y =
-        case removeValue x right of
-            (_, right) -> (Nothing, Node left y right)
-     | otherwise = case (left, right) of
-                (Leaf, Leaf) -> (Just x, Leaf)
-                (Leaf, _) -> (Just x, right)
-                (_, Leaf) -> (Just x, left)
-                (_, _) ->
-                    case removeValue (findMin right) right of
-                        -- after removing, the right node disappear.
-                        (_, Leaf) -> (Just x, Node left (findMin right) Leaf)
-                        (Just x, right) -> (Just x, Node left (findMin right) right)
+genSeed:: StdGen
+genSeed = mkStdGen 100
 
-findMin :: Tree a -> a
-findMin tree = 
-    case tree of
-        Leaf -> error "findMin: empty tree"
-        Node Leaf x _ -> x
-        Node left _ _ -> findMin left
+-- the StdGen will be passed when we runState
+gen2RandomValues :: State StdGen (Int, Int)
+gen2RandomValues = do
+    a <- randomSt
+    b <- randomSt
+    return (a,b)
+    -- unfold the above code will look like this:
+    -- randomSt >>= \a ->
+    -- randomSt >>= \b ->
+    -- pure (a, b)
+genAndPrintRandomTwiceByState :: IO ()
+genAndPrintRandomTwiceByState = do
+    let v = runState gen2RandomValues genSeed
+    print $ fst v
+
+
+-- ThinkMore: practice1, use a state to implement a counter, but it only have one state
+type MyCounter = Int
+-- we should have a function with a pre-defined state, and then we could use a State monad
+-- count add the counter 1, return current value and then return the new counter
+mycount :: State MyCounter Int
+mycount = state $ \counter -> (counter, counter+1)
+
+callCounter3Times :: State MyCounter [Int]
+callCounter3Times = do
+    a <- mycount
+    b <- mycount
+    c <- mycount
+    return [a,b,c]
+
+-- ThinkMore: practice2, use a state to implement a counter, which could pass a BaseNumber to setup the interval.
+type MyCounter2 = Int
+
+mycountS :: Int -> State MyCounter Int
+mycountS n = state $ \counter -> (counter, counter+n)
+
+callCounter3Times2 :: State MyCounter [Int]
+callCounter3Times2 = do
+    a <- mycountS 1
+    b <- mycountS 2
+    c <- mycountS 3
+    return [a,b,c]
