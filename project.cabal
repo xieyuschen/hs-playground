@@ -1,44 +1,41 @@
 cabal-version:      2.4
 name:               project
-version:            0.1.0.0
+version: 0.1.0.0
+common common-depends
+    build-depends:
+        base >= 4.14 && < 4.17,
+        mtl,
+        text,
+        transformers,
+        random
 
 library monadt
+    import: common-depends
     exposed-modules:  
         TryCombineMonads
         , TryMaybeT
         , TryExceptTAndIO 
-    build-depends:    
-        base ^>=4.16.4.0,
-        mtl,
-        text,
-        transformers
     hs-source-dirs:   src/monadt
     default-language: Haskell2010
 
 library monads
+    import: common-depends
     exposed-modules:  
         TryWriter
         ,TryReader
         ,TryState
         ,TryError
         ,TryState_Bst
-    build-depends:    
-        base ^>=4.16.4.0,
-        mtl,
-        transformers,
-        random
+    
     hs-source-dirs:   src/monads
     default-language: Haskell2010
 
 
 executable project
-    main-is:          Main.hs
-
+    import: common-depends
+    main-is:          Main.hs 
     build-depends:
-        base ^>=4.16.4.0,
-        mtl,
-        transformers,
         monads,
-        monadt,
+        monadt
     hs-source-dirs:   .
     default-language: Haskell2010
