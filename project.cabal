@@ -4,8 +4,9 @@ version:            0.1.0.0
 
 library monadt
     exposed-modules:  
-        TryMaybeT 
-        ,TsWay
+        TryCombineMonads
+        , TryMaybeT
+        , TryExceptTAndIO 
     build-depends:    
         base ^>=4.16.4.0,
         mtl,
