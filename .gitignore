@@ -57,4 +57,4 @@ TAGS
 *.log
 
 # ignore the main because it's not a library, just somewhere to trigger the library
-Main.hs
+./Main.hs
