@@ -13,7 +13,7 @@ library logdemo
     import: common-depends
     exposed-modules:  
         ParseFlags
-    hs-source-dirs:   src/logdemo
+    hs-source-dirs:   practices/logdemo
     default-language: Haskell2010
 
 library monadt
@@ -22,7 +22,7 @@ library monadt
         TryCombineMonads
         , TryMaybeT
         , TryExceptTAndIO 
-    hs-source-dirs:   src/monadt
+    hs-source-dirs:   practices/monadt
     default-language: Haskell2010
 
 library monads
@@ -34,7 +34,7 @@ library monads
         ,TryError
         ,TryState_Bst
     
-    hs-source-dirs:   src/monads
+    hs-source-dirs:   practices/monads
     default-language: Haskell2010
 
 
