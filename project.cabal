@@ -9,6 +9,13 @@ common common-depends
         transformers,
         random
 
+library logdemo
+    import: common-depends
+    exposed-modules:  
+        ParseFlags
+    hs-source-dirs:   src/logdemo
+    default-language: Haskell2010
+
 library monadt
     import: common-depends
     exposed-modules:  
@@ -36,6 +43,7 @@ executable project
     main-is:          Main.hs 
     build-depends:
         monads,
-        monadt
+        monadt,
+        logdemo
     hs-source-dirs:   .
     default-language: Haskell2010
