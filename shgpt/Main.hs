@@ -2,7 +2,7 @@
 import System.Process
 import Data.Text.IO (hGetLine)
 import GHC.IO.Handle (isEOF, hGetLine, hIsEOF, hIsClosed)
-import GHC.IO.Handle.Types (Handle)
+import GHC.IO.Handle.Types (Handle, Handle__ (Handle__))
 import Data.Type.Equality (outer)
 import Control.Exception
 import System.IO
@@ -16,7 +16,9 @@ main = do
       print e
     Right (_, out , _, p) -> do
       myLoop out
+      waitForProcess p >>= \x -> return ()
   print "end"
+
 
 try' :: IO a -> IO (Either IOException a)
 try' = try
