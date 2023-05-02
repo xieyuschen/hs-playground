@@ -27,6 +27,8 @@ executable shgpt
     build-depends:
         lgpt
         ,pipes
+        ,aeson
+        ,utf8-string
 
     hs-source-dirs:  shgpt
     default-language: Haskell2010
